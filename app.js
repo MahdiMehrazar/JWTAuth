@@ -1,7 +1,7 @@
 require("dotenv").config();
 require("./config/database").connect();
 const express = require("express");
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const auth = require("./middleware/auth");
 
@@ -11,6 +11,9 @@ app.use(express.json());
 
 // importing user context
 const User = require("./model/user");
+
+// Winston logger
+const logger = require('./utils/logger');
 
 // Register
 app.post("/register", async (req, res) => {
@@ -53,16 +56,20 @@ app.post("/register", async (req, res) => {
     // save user token
     user.token = token;
 
+    // log user registered
+    logger.info(`new user registered ${user}`);
+
     // return new user
     res.status(201).json(user);
   } catch (err) {
-    console.log(err);
+    // log user registration error
+    logger.error("Important error: ", new Error("user registration failure"));
   }
 });
 
 // Login
 app.post("/login", async (req, res) => {
- try {
+  try {
     // Get user input
     const { email, password } = req.body;
 
@@ -87,16 +94,17 @@ app.post("/login", async (req, res) => {
       user.token = token;
 
       // user
+      logger.info(`user ${user} logged in successfully`);
       res.status(200).json(user);
     }
     res.status(400).send("Invalid Credentials");
   } catch (err) {
-    console.log(err);
+    logger.error("Important error: ", new Error("user login failure"));
   }
 });
 
 app.post("/welcome", auth, (req, res) => {
-    res.status(200).send("Welcome");
+  res.status(200).send("Welcome");
 });
 
 module.exports = app;
