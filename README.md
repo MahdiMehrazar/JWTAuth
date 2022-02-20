@@ -1,4 +1,4 @@
-# JWTAuth
+# JWTAuth + logging with Winston
 by Mahdi
 
 Needs a local .env file with the following parameters, along with a MongoDB database connection.
